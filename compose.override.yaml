@@ -1,0 +1,12 @@
+
+# services:
+# ###> doctrine/doctrine-bundle ###
+#   database:
+#     ports:
+#       - "5432"
+
+#   pgadmin:
+#     ports:
+#       - "8080:80" # Port pour accéder à l'interface web de pgAdmin
+    
+# ###< doctrine/doctrine-bundle ###
