@@ -1,13 +1,15 @@
-<?php
+<?php 
+
+// src/Entity/User.php
 
 namespace App\Entity;
 
-use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 
-#[ORM\Entity(repositoryClass: UserRepository::class)]
-#[ORM\Table(name: '`user`')]
-class User
+#[ORM\Entity]
+class User implements UserInterface, PasswordAuthenticatedUserInterface  // Implémentation de UserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -26,8 +28,8 @@ class User
     #[ORM\Column(length: 255)]
     private ?string $password = null;
 
-    #[ORM\Column(type: 'json', length: 255)]
-    private $role = [];
+    #[ORM\Column(type: 'json')]
+    private array $role = [];
 
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
@@ -37,8 +39,50 @@ class User
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    private ?client $client = null;
+    private ?Client $client = null;
 
+    // Implémentation de UserInterface
+    public function getUserIdentifier(): string
+    {
+        return (string) $this->email;  // Retourner l'email comme identifiant de l'utilisateur
+    }
+
+    public function getRoles(): array
+    {
+        return $this->role ?: ['ROLE_USER'];  // Renvoyer le rôle par défaut si vide
+    }
+
+    public function setRoles(array $roles): static
+    {
+        $this->role = $roles;
+        return $this;
+    }
+
+    public function getPassword(): ?string
+    {
+        return $this->password;
+    }
+
+    public function setPassword(string $password): static
+    {
+        $this->password = $password;
+        return $this;
+    }
+
+    // Méthode getSalt() est obligatoire, mais elle peut être vide si vous utilisez bcrypt ou argon2
+    public function getSalt(): ?string
+    {
+        return null;  // Pas de sel nécessaire si vous utilisez bcrypt ou argon2
+    }
+
+    // Implémentation de `eraseCredentials()`
+    public function eraseCredentials(): void
+    {
+        // Si vous avez stocké un mot de passe temporaire ou un token en clair, vous pouvez le supprimer ici
+        // Exemple : $this->temporaryCredential = null;
+    }
+
+    // Méthodes d'accès aux autres propriétés
     public function getId(): ?int
     {
         return $this->id;
@@ -52,7 +96,6 @@ class User
     public function setFirstname(string $firstname): static
     {
         $this->firstname = $firstname;
-
         return $this;
     }
 
@@ -64,7 +107,6 @@ class User
     public function setLastname(string $lastname): static
     {
         $this->lastname = $lastname;
-
         return $this;
     }
 
@@ -76,34 +118,6 @@ class User
     public function setEmail(string $email): static
     {
         $this->email = $email;
-
-        return $this;
-    }
-
-    public function getPassword(): ?string
-    {
-        return $this->password;
-    }
-
-    public function setPassword(string $password): static
-    {
-        $this->password = $password;
-
-        return $this;
-    }
-
-    public function getRole(): array
-    {
-        return $this->role;
-        $role[]='ROLE_USER';
-
-        return array_unique($role);
-    }
-
-    public function setRole(string $role): static
-    {
-        $this->role = $role;
-
         return $this;
     }
 
@@ -115,7 +129,6 @@ class User
     public function setCreatedAt(\DateTimeImmutable $createdAt): static
     {
         $this->createdAt = $createdAt;
-
         return $this;
     }
 
@@ -127,19 +140,17 @@ class User
     public function setUpdatedAt(\DateTimeImmutable $updatedAt): static
     {
         $this->updatedAt = $updatedAt;
-
         return $this;
     }
 
-    public function getClient(): ?client
+    public function getClient(): ?Client
     {
         return $this->client;
     }
 
-    public function setClient(?client $client): static
+    public function setClient(?Client $client): static
     {
         $this->client = $client;
-
         return $this;
     }
 }
