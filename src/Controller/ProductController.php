@@ -27,7 +27,7 @@ class ProductController extends AbstractController
         $this->cache = $cache;
     }
 
-    // Route pour récupérer tous les produits 
+    // Route pour récupérer tous les produits avec cache
     
     #[Route('/api/products', name: 'get_all_products', methods: 'GET')]
     public function getAll(ProductRepository $productRepository, Request $request): JsonResponse
@@ -57,7 +57,7 @@ class ProductController extends AbstractController
         ]), JsonResponse::HTTP_OK, [], true);
     }
 
-    // Route pour récupérer un produit par son ID 
+    // Route pour récupérer un produit par son ID avec cache
     #[Route('/api/products/{id}', name: 'get_product', methods: 'GET')]
     public function get(Product $product): JsonResponse
     {
