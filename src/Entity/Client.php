@@ -1,9 +1,12 @@
 <?php
 
+// src/Entity/Client.php
+
 namespace App\Entity;
 
 use App\Repository\ClientRepository;
 use Doctrine\ORM\Mapping as ORM;
+use JMS\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: ClientRepository::class)]
 class Client
@@ -11,9 +14,11 @@ class Client
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['client','user'])]  
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['client'])]  
     private ?string $name = null;
 
     #[ORM\Column(length: 255)]
@@ -38,7 +43,6 @@ class Client
     public function setName(string $name): static
     {
         $this->name = $name;
-
         return $this;
     }
 
@@ -50,7 +54,6 @@ class Client
     public function setEmail(string $email): static
     {
         $this->email = $email;
-
         return $this;
     }
 
@@ -62,7 +65,6 @@ class Client
     public function setCreatedAt(\DateTimeImmutable $createdAt): static
     {
         $this->createdAt = $createdAt;
-
         return $this;
     }
 
@@ -74,7 +76,6 @@ class Client
     public function setUpdatedAt(\DateTimeImmutable $updatedAt): static
     {
         $this->updatedAt = $updatedAt;
-
         return $this;
     }
 }
