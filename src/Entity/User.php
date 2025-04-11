@@ -1,15 +1,44 @@
-<?php 
-
-// src/Entity/User.php
+<?php
 
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use JMS\Serializer\Annotation\Groups;
+use Doctrine\ORM\Mapping\PrePersist;
+use Doctrine\ORM\Mapping\PreUpdate;
+use Hateoas\Configuration\Annotation as Hateoas;
 
 #[ORM\Entity]
-class User implements UserInterface, PasswordAuthenticatedUserInterface  // Implémentation de UserInterface
+#[ORM\HasLifecycleCallbacks]
+/**
+ * @Hateoas\Relation(
+ *      "self",
+ *      href = @Hateoas\Route(
+ *          "get_user",
+ *          parameters = { "id" = "expr(object.getId())" }
+ *      ),
+ *      exclusion = @Hateoas\Exclusion(groups={"user"})
+ * )
+ * @Hateoas\Relation(
+ *      "update",
+ *      href = @Hateoas\Route(
+ *          "update_user",
+ *          parameters = { "id" = "expr(object.getId())" }
+ *      ),
+ *      exclusion = @Hateoas\Exclusion(groups={"user"})
+ * )
+ * @Hateoas\Relation(
+ *      "delete",
+ *      href = @Hateoas\Route(
+ *          "delete_user",
+ *          parameters = { "id" = "expr(object.getId())" }
+ *      ),
+ *      exclusion = @Hateoas\Exclusion(groups={"user"})
+ * )
+ */
+class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -17,19 +46,22 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface  // Impl
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['user'])]
     private ?string $firstname = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['user'])]
     private ?string $lastname = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['user'])]
     private ?string $email = null;
 
     #[ORM\Column(length: 255)]
     private ?string $password = null;
 
     #[ORM\Column(type: 'json')]
-    private array $role = [];
+    private array $role = ['ROLE_USER'];
 
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
@@ -39,22 +71,23 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface  // Impl
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['user', 'client'])]
     private ?Client $client = null;
 
     // Implémentation de UserInterface
     public function getUserIdentifier(): string
     {
-        return (string) $this->email;  // Retourner l'email comme identifiant de l'utilisateur
+        return (string) $this->email;
     }
 
     public function getRoles(): array
     {
-        return $this->role ?: ['ROLE_USER'];  // Renvoyer le rôle par défaut si vide
+        return $this->role ?: ['ROLE_USER']; 
     }
 
     public function setRoles(array $roles): static
     {
-        $this->role = $roles;
+        $this->role = $roles;  
         return $this;
     }
 
@@ -69,20 +102,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface  // Impl
         return $this;
     }
 
-    // Méthode getSalt() est obligatoire, mais elle peut être vide si vous utilisez bcrypt ou argon2
     public function getSalt(): ?string
     {
-        return null;  // Pas de sel nécessaire si vous utilisez bcrypt ou argon2
+        return null;
     }
 
-    // Implémentation de `eraseCredentials()`
     public function eraseCredentials(): void
     {
-        // Si vous avez stocké un mot de passe temporaire ou un token en clair, vous pouvez le supprimer ici
-        // Exemple : $this->temporaryCredential = null;
+        // Si des données sensibles ou temporaires sont stockées, vous pouvez les effacer ici
     }
 
-    // Méthodes d'accès aux autres propriétés
     public function getId(): ?int
     {
         return $this->id;
@@ -152,5 +181,23 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface  // Impl
     {
         $this->client = $client;
         return $this;
+    }
+
+    #[PrePersist]
+    public function setCreatedAtValue(): void
+    {
+        $now = new \DateTimeImmutable();
+        if (!$this->createdAt) {
+            $this->createdAt = new \DateTimeImmutable();
+        }
+        if (!$this->updatedAt) {
+            $this->updatedAt = $now;
+        }
+    }
+
+    #[PreUpdate]
+    public function setUpdatedAtValue(): void
+    {
+        $this->updatedAt = new \DateTimeImmutable();
     }
 }

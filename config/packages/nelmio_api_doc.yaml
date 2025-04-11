@@ -1,9 +1,398 @@
 nelmio_api_doc:
     documentation:
         info:
-            title: My App
-            description: This is an awesome app!
+            title: BileMo API
+            description: API permettant d'accéder au catalogue BileMo via une interface.
             version: 1.0.0
-    areas: # to filter documented areas
-        path_patterns:
-            - ^/api(?!/doc$) # Accepts routes under /api except /api/doc
+        paths:
+            # Route pour se connecter et obtenir un token JWT
+            /api/login_check:
+                post:
+                    operationId: postCredentialsItem
+                    tags:
+                        - Token
+                    summary: Permet d'obtenir le token JWT pour se logger.
+                    description: |
+                        Cette route permet à un utilisateur d'obtenir un token JWT en envoyant les informations de connexion (email et mot de passe).
+                    requestBody:
+                        description: Données de connexion (email et mot de passe) pour générer un token JWT.
+                        content:
+                            application/json:
+                                schema:
+                                    type: object
+                                    required:
+                                        - username
+                                        - password
+                                    properties:
+                                        username:
+                                            type: string
+                                            example: "admin@example.com"
+                                        password:
+                                            type: string
+                                            example: "password"
+                    responses:
+                        '200':
+                            description: Retourne un token JWT valide.
+                            content:
+                                application/json:
+                                    schema:
+                                        type: object
+                                        properties:
+                                            token:
+                                                type: string
+                                                description: Le token JWT généré
+                        '401':
+                            description: Erreur d'authentification (mauvais email ou mot de passe).
+                            content:
+                                application/json:
+                                    schema:
+                                        type: object
+                                        properties:
+                                            error:
+                                                type: string
+                                                example: "Invalid credentials"
+                    security: []
+
+            # Route pour récupérer tous les produits
+            /api/products:
+                get:
+                    operationId: getAllProducts
+                    tags:
+                        - Products
+                    summary: Récupérer la liste de tous les produits.
+                    description: |
+                        Cette méthode permet de récupérer tous les produits disponibles dans la base de données.
+                    responses:
+                        '200':
+                            description: Liste des produits retournée avec succès.
+                            content:
+                                application/json:
+                                    schema:
+                                        type: array
+                                        items:
+                                            type: object
+                                            properties:
+                                                id:
+                                                    type: integer
+                                                name:
+                                                    type: string
+                                                description:
+                                                    type: string
+                                                price:
+                                                    type: number
+                                                    format: float
+                                                stock:
+                                                    type: integer
+                        '404':
+                            description: Aucun produit trouvé.
+                post:
+                    operationId: createProduct
+                    tags:
+                        - Products
+                    summary: Créer un produit.
+                    description: |
+                        Cette méthode permet de créer un nouveau produit en envoyant les données nécessaires (name, description, price, stock).
+                    requestBody:
+                        description: Données nécessaires pour créer un produit.
+                        content:
+                            application/json:
+                                schema:
+                                    type: object
+                                    required:
+                                        - name
+                                        - description
+                                        - price
+                                        - stock
+                                    properties:
+                                        name:
+                                            type: string
+                                            description: Nom du produit
+                                        description:
+                                            type: string
+                                            description: Description du produit
+                                        price:
+                                            type: number
+                                            format: float
+                                            description: Prix du produit
+                                        stock:
+                                            type: integer
+                                            description: Quantité en stock
+                    responses:
+                        '201':
+                            description: Produit créé avec succès.
+                            content:
+                                application/json:
+                                    schema:
+                                        type: object
+                                        properties:
+                                            id:
+                                                type: integer
+                                            name:
+                                                type: string
+                                            description:
+                                                type: string
+                                            price:
+                                                type: number
+                                                format: float
+                                            stock:
+                                                type: integer
+                        '400':
+                            description: Données invalides.
+
+            # Route pour récupérer un produit par son ID
+            /api/products/{id}:
+                parameters:
+                    - name: id
+                      in: path
+                      required: true
+                      description: ID du produit
+                      schema:
+                        type: integer
+                get:
+                    operationId: getProduct
+                    tags:
+                        - Products
+                    summary: Consulter un produit spécifique.
+                    description: Cette méthode permet de récupérer les informations d'un produit en utilisant son ID.
+                    responses:
+                        '200':
+                            description: Produit trouvé.
+                            content:
+                                application/json:
+                                    schema:
+                                        type: object
+                                        properties:
+                                            id:
+                                                type: integer
+                                            name:
+                                                type: string
+                                            description:
+                                                type: string
+                                            price:
+                                                type: number
+                                                format: float
+                                            stock:
+                                                type: integer
+                        '404':
+                            description: Produit non trouvé.
+                put:
+                    operationId: updateProduct
+                    tags:
+                        - Products
+                    summary: Mettre à jour un produit spécifique.
+                    description: Cette méthode permet de mettre à jour un produit en utilisant son ID.
+                    requestBody:
+                        description: Données nécessaires pour mettre à jour un produit.
+                        content:
+                            application/json:
+                                schema:
+                                    type: object
+                                    required:
+                                        - name
+                                        - description
+                                        - price
+                                        - stock
+                                    properties:
+                                        name:
+                                            type: string
+                                            description: Nom du produit
+                                        description:
+                                            type: string
+                                            description: Description du produit
+                                        price:
+                                            type: number
+                                            format: float
+                                            description: Prix du produit
+                                        stock:
+                                            type: integer
+                                            description: Quantité en stock
+                    responses:
+                        '200':
+                            description: Produit mis à jour avec succès.
+                            content:
+                                application/json:
+                                    schema:
+                                        type: object
+                                        properties:
+                                            id:
+                                                type: integer
+                                            name:
+                                                type: string
+                                            description:
+                                                type: string
+                                            price:
+                                                type: number
+                                                format: float
+                                            stock:
+                                                type: integer
+                        '404':
+                            description: Produit non trouvé.
+                        '400':
+                            description: Données invalides.
+                delete:
+                    operationId: deleteProduct
+                    tags:
+                        - Products
+                    summary: Supprimer un produit.
+                    description: Cette méthode permet de supprimer un produit en utilisant son ID.
+                    responses:
+                        '204':
+                            description: Produit supprimé avec succès.
+                        '404':
+                            description: Produit non trouvé.
+
+            # Route pour créer un utilisateur
+            /api/users:
+                post:
+                    operationId: createUser
+                    tags:
+                        - Users
+                    summary: Créer un utilisateur.
+                    description: |
+                        Cette méthode permet de créer un nouvel utilisateur en envoyant les données nécessaires (firstname, lastname, email, password).
+                    requestBody:
+                        description: Données nécessaires pour créer un utilisateur.
+                        content:
+                            application/json:
+                                schema:
+                                    type: object
+                                    required:
+                                        - firstname
+                                        - lastname
+                                        - email
+                                        - password
+                                    properties:
+                                        firstname:
+                                            type: string
+                                            description: Prénom de l'utilisateur
+                                        lastname:
+                                            type: string
+                                            description: Nom de l'utilisateur
+                                        email:
+                                            type: string
+                                            format: email
+                                            description: Email de l'utilisateur
+                                        password:
+                                            type: string
+                                            description: Mot de passe de l'utilisateur
+                    responses:
+                        '201':
+                            description: Utilisateur créé avec succès.
+                            content:
+                                application/json:
+                                    schema:
+                                        type: object
+                                        properties:
+                                            id:
+                                                type: integer
+                                            firstname:
+                                                type: string
+                                            lastname:
+                                                type: string
+                                            email:
+                                                type: string
+                        '400':
+                            description: Données invalides.
+
+            # Route pour consulter ou supprimer un utilisateur
+            /api/users/{id}:
+                parameters:
+                    - name: id
+                      in: path
+                      required: true
+                      description: ID de l'utilisateur
+                      schema:
+                        type: integer
+                get:
+                    operationId: getUser
+                    tags:
+                        - Users
+                    summary: Consulter un utilisateur spécifique.
+                    description: Cette méthode permet de récupérer les informations d'un utilisateur en utilisant son ID.
+                    responses:
+                        '200':
+                            description: Utilisateur trouvé.
+                            content:
+                                application/json:
+                                    schema:
+                                        type: object
+                                        properties:
+                                            id:
+                                                type: integer
+                                            firstname:
+                                                type: string
+                                            lastname:
+                                                type: string
+                                            email:
+                                                type: string
+                        '404':
+                            description: Utilisateur non trouvé.
+                delete:
+                    operationId: deleteUser
+                    tags:
+                        - Users
+                    summary: Supprimer un utilisateur.
+                    description: Cette méthode permet de supprimer un utilisateur en utilisant son ID.
+                    responses:
+                        '204':
+                            description: Utilisateur supprimé avec succès.
+                        '404':
+                            description: Utilisateur non trouvé.
+                    # Route pour mettre à jour un utilisateur spécifique
+                put:
+                    operationId: updateUser
+                    tags:
+                        - Users
+                    summary: Mettre à jour un utilisateur spécifique.
+                    description: |
+                        Cette méthode permet de mettre à jour un utilisateur en utilisant son ID.
+                        Les informations suivantes peuvent être mises à jour : prénom, nom, email et mot de passe.
+                    requestBody:
+                        description: Données nécessaires pour mettre à jour un utilisateur.
+                        content:
+                            application/json:
+                                schema:
+                                    type: object
+                                    required:
+                                        - firstname
+                                        - lastname
+                                        - email
+                                    properties:
+                                        firstname:
+                                            type: string
+                                            description: Prénom de l'utilisateur
+                                        lastname:
+                                            type: string
+                                            description: Nom de l'utilisateur
+                                        email:
+                                            type: string
+                                            format: email
+                                            description: Email de l'utilisateur
+                                        password:
+                                            type: string
+                                            description: Nouveau mot de passe de l'utilisateur (facultatif)
+                    responses:
+                        '200':
+                            description: Utilisateur mis à jour avec succès.
+                            content:
+                                application/json:
+                                    schema:
+                                        type: object
+                                        properties:
+                                            id:
+                                                type: integer
+                                            firstname:
+                                                type: string
+                                            lastname:
+                                                type: string
+                                            email:
+                                                type: string
+                                            password:
+                                                type: string
+                        '404':
+                            description: Utilisateur non trouvé.
+                        '400':
+                            description: Données invalides. 
+                    
+
+                                    

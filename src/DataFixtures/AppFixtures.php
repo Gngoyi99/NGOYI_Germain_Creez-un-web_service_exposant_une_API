@@ -59,7 +59,7 @@ class AppFixtures extends Fixture
         $admin->setPassword($this->userPasswordHasher->hashPassword($admin, 'password'));
         $admin->setCreatedAt(new \DateTimeImmutable());
         $admin->setUpdatedAt(new \DateTimeImmutable());
-        $admin->setClient($client1); // Assignation d'un client à l'admin
+        $admin->setClient($client1); 
         $manager->persist($admin);
 
         // Sauvegarder dans la base de données
