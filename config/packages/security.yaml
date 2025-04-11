@@ -36,4 +36,5 @@ security:
     # Access control
     access_control:
         - { path: ^/api/login, roles: PUBLIC_ACCESS }  # La route login est publique
+        - { path: ^/api/doc, roles: PUBLIC_ACCESS }  # La route login est publique
         - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }  # Les autres routes nécessitent une authentification

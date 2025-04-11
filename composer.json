@@ -12,8 +12,12 @@
         "doctrine/doctrine-bundle": "^2.13",
         "doctrine/doctrine-migrations-bundle": "^3.4",
         "doctrine/orm": "^3.3",
+        "jms/serializer-bundle": "*",
         "lexik/jwt-authentication-bundle": "^3.1",
         "nelmio/api-doc-bundle": "^5.0",
+        "predis/predis": "^2.3",
+        "symfony/asset": "7.2.*",
+        "symfony/cache": "7.2.*",
         "symfony/console": "7.2.*",
         "symfony/dotenv": "7.2.*",
         "symfony/flex": "^2",
@@ -21,7 +25,12 @@
         "symfony/runtime": "7.2.*",
         "symfony/security-bundle": "7.2.*",
         "symfony/serializer": "7.2.*",
-        "symfony/yaml": "7.2.*"
+        "symfony/twig-bundle": "7.2.*",
+        "symfony/yaml": "7.2.*",
+        "twig/extra-bundle": "^2.12|^3.0",
+        "twig/twig": "^2.12|^3.0",
+        "willdurand/hateoas-bundle": "^2.7",
+        "zircote/swagger-php": "^5.0"
     },
     "require-dev": {
         "doctrine/doctrine-fixtures-bundle": "^4.0",
